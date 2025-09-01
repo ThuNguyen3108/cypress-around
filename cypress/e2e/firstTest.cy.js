@@ -89,7 +89,7 @@ it('Cypress Chains', () => {
     .should('have.text', 'Option 1')
 })
 
-it.only('Reusing Locators', () => {
+it('Reusing Locators', () => {
 
     // This will not work !!! Don't do like this
     // const inputEmail1 = cy.get('#inputEmail1');
@@ -110,8 +110,8 @@ it.only('Reusing Locators', () => {
         // Tìm nb-radio trong cùng form và wrap để dùng tiếp Cypress command
         cy.wrap(inputEmail.parents('form').find('nb-radio'))
         // Bạn cũng có thể wrap 1 string để assert
-        cy.wrap('Hello').then( hello => {
-            return hello
+        cy.wrap('Hello').then(result => {
+            return result;
         }).should('equal', 'Hello')
        // foo = inputEmail
 
@@ -121,7 +121,60 @@ it.only('Reusing Locators', () => {
     cy.get('@inputEmail2').click()
 })
 
+it('Extracting Value', () => {
+    // 1. using a JQuery element
+    cy.get('[for = "exampleInputEmail1"]').then(label => {
+        // expect(label.text()).to.equal('Email address')
+        // cy.log(label.text())
+        const emailLable = label.text();
+        console.log('Email label: ' + emailLable)
+    })
 
+    //2. using invoke command
+    cy.get('[for = "exampleInputEmail1"]').invoke('text').as('emailLabel2')
+    cy.get('[for = "exampleInputEmail1"]').invoke('text').then(text => {
+    cy.log(text)
+    console.log('Email label: ' + text)
+
+     })
+
+    //3. using attribute value
+    cy.get('#exampleInputEmail1').invoke('attr', 'class').then(classValue => {
+        cy.log(classValue)
+    })
+    cy.get('#exampleInputEmail1').should('have.attr', 'class', 'input-full-width size-medium status-basic shape-rectangle nb-transition')
+
+   // 4. Invoke input field value
+   cy.get('#exampleInputEmail1').type('hello@test.com')
+   cy.get('#exampleInputEmail1').invoke('prop','value').then(value => {
+    console.log('Input value: ' + value)
+   })
+
+})
+
+it.only('Assertions', () => {
+
+    cy.get('[for="exampleInputEmail1"]').should('have.text', 'Email address')
+
+    cy.get('[for="exampleInputEmail1"]').then( label => {
+        expect(label).to.have.text('Email address')
+    })
+
+    cy.get('[for="exampleInputEmail1"]').invoke('text').then( emailLabel => {
+        expect(emailLabel).to.equal('Email address')
+        cy.wrap(emailLabel).should('equal', 'Email address')
+    })
+
+})
+
+it.only('Timeouts', () => {
+    cy.contains('Modal & Overlays').click()
+    cy.contains('Dialog').click()
+
+    cy.contains('Open with delay 10 seconds').click()
+    cy.get('nb-dialog-container nb-card-header', {timeout: 11000})
+        .should('have.text', 'Friendly reminder')
+})
 
 
 
