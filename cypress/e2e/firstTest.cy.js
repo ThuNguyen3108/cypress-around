@@ -40,7 +40,7 @@ it('Hello world', () => {
 
 })
 
-it.only('Cypress Locator Methods', () => {
+it('Cypress Locator Methods', () => {
     // Theory
     // get() - to find elements in the page
     // find() - to find only child elements
@@ -57,6 +57,73 @@ it.only('Cypress Locator Methods', () => {
 
 
 })
+
+ it('Child Element', () => {
+        cy.contains('nb-card', 'Using the Grid').find('.row').find('button')
+        cy.get('nb-card').find('nb-radio-group').contains('Option 1')
+        cy.get('nb-card > nb-card-body [placeholder="Email"]')
+
+    })
+
+it('Parent Element', () => {
+    cy.get('#inputEmail1').parents('form').find('button')
+    cy.contains('Using the Grid').parents().find('button')
+    cy.get('#inputEmail1').parentsUntil('nb-card-body').find('button')
+})
+
+it('Cypress Chains', () => {
+    // cy.get('#inputEmail1')
+    // .parents('form')
+    // .find('button')
+    // .should('contain', 'Sign in')
+    // .parents('nb-card')
+    // .find('nb-card-header')
+    // .should('contain', 'Using the Grid')
+    cy.get('#inputEmail1')
+    .parents('form')
+    .find('button')
+    .click()
+    .parents('form')
+    .find('nb-radio')
+    .first()
+    .should('have.text', 'Option 1')
+})
+
+it.only('Reusing Locators', () => {
+
+    // This will not work !!! Don't do like this
+    // const inputEmail1 = cy.get('#inputEmail1');
+    // inputEmail1.parents('form').find('button')
+    // inputEmail1.parents('form').find('nb-radio')
+
+    // 1. Cypress Alias
+    cy.get('#inputEmail1').as('inputEmail1')
+    cy.get('@inputEmail1').parents('form').find('button')
+    cy.get('@inputEmail1').parents('form').find('nb-radio')
+
+    // 2. Using then() method
+    // let foo; // foo is jQuery element
+    cy.get('#inputEmail1').then(inputEmail => {
+        // inputEmail là jQuery element
+        // Tìm button trong cùng form và wrap lại thành Cypress chain
+        cy.wrap(inputEmail.parents('form').find('button'))
+        // Tìm nb-radio trong cùng form và wrap để dùng tiếp Cypress command
+        cy.wrap(inputEmail.parents('form').find('nb-radio'))
+        // Bạn cũng có thể wrap 1 string để assert
+        cy.wrap('Hello').then( hello => {
+            return hello
+        }).should('equal', 'Hello')
+       // foo = inputEmail
+
+       cy.wrap(inputEmail).as('inputEmail2')
+    })
+
+    cy.get('@inputEmail2').click()
+})
+
+
+
+
 
 // describe('Test Suite 1', () => {
 //     it('Test Case 1', () => {
